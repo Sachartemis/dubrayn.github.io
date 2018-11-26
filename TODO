@@ -42,7 +42,7 @@ Project:
 
 ---- WEEK4 ----
 
-* Python
+* Python (start)
 
 === TP4
 
@@ -64,19 +64,21 @@ Project:
 
 * introduction
 * project
-* POVray
+* Python (end)
 
 === TP0
 
 ---- WEEK1 ----
 
-* blender
+* sum optimization
+* POVray
 
 === TP1
 
 ---- WEEK2 ----
 
-* sum optimization
+* git advanced uses
+* blender
 
 === TP2
 
@@ -123,7 +125,7 @@ Project:
 
 ---- Session 2 ----
 
-* python bindins - swig
+* python bindings - swig
 
 ---- Session 3 ----
 
@@ -220,3 +222,6 @@ Project:
 BUG: trailing empty code lines are removed by markdown parser in remark.js
 BUG: plotly.js does not like CSS scale transform (mouse coords are messed up)
 
+Additional slides:
+
+* git: advanced techniques
