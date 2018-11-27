@@ -50,11 +50,376 @@ workflow : travailler sur un autre réseau
 * git commit --amend (corriger un commit)
 * git rebase --interactive HEAD~6 (corriger les 5 derniers commits)
 
+---
 
+# Special `git` workflows
+
+.row[
+.column.w60[
+.block[
+
+## Offline `git` workflow 1
+
+:arrow_right: the "official" repo is on network `A`
+
+:arrow_right: you have to develop on network `B`
+
+:arrow_right: you can occasionally connect networks `A` and `B`
+
+]
+## Example
+
+:arrow_right: the repo for a **top-secret code** is on a company's intranet
+
+:arrow_right: you want to work on the code on a company's laptop
+
+:arrow_right: you can connect the laptop to the intranet when present at the company
+
+:arrow_right: the code is allowed on the laptop or the intranet **only**
+
+]
+.column.middle.w40[
+.mermaid[
+    sequenceDiagram
+        Note over Intranet: Repo
+        Intranet->>Laptop: LAN access
+        Note over Intranet: Changes
+        Note over Laptop: Changes
+        Laptop->>Intranet: LAN access
+        Note over Intranet: Updated repo
+]
+]
+]
 
 ---
 
+# Special `git` workflows
 
+.row[
+.column.w60[
+.block[
+
+## Offline `git` workflow 1
+
+:arrow_right: the "official" repo is on network `A`
+
+:arrow_right: you have to develop on network `B`
+
+:arrow_right: you can occasionally connect networks `A` and `B`
+
+]
+## LAN solution
+
+1. connect the laptop to the intranet
+1. `git clone` on the laptop
+1. disconnect the laptop
+1. create commits on the laptop
+1. connect the laptop to the intranet
+1. `git push` on the laptop (possible merge conflict(s))
+
+]
+.column.middle.w40[
+.mermaid[
+    sequenceDiagram
+        Note over Intranet: Repo
+        Intranet->>Laptop: git clone
+        Note over Intranet: Changes
+        Note over Laptop: Changes
+        Laptop->>Intranet: git push
+        Note over Intranet: Updated repo
+]
+]
+]
+
+---
+
+# Special `git` workflows
+
+## LAN solution
+
+1. connect the laptop to the intranet
+1. `git clone` on the laptop
+```shell
+laptop> git clone ssh://gitrepos.intra.company.com/topsecret.git
+```
+1. disconnect the laptop
+1. create commits on the laptop
+```shell
+laptop> git add ...
+laptop> git commit -m "user can now order quiches"
+laptop> git add ...
+laptop> git commit -m "user can now order pizzas"
+```
+1. connect the laptop to the intranet
+1. `git push` on the laptop (possible merge conflict(s))
+```shell
+laptop> git push
+```
+
+---
+
+# Special `git` workflows
+
+.row[
+.column.w60[
+.block[
+
+## Offline `git` workflow 2
+
+:arrow_right: the "official" repo is on network `A`
+
+:arrow_right: you have to develop on network `B`
+
+:arrow_right: you can use **USB sticks** between networks `A` and `B` 
+]
+
+## Example
+
+:arrow_right: the repo for a **top-secret code** is on a company's intranet
+
+:arrow_right: you want to work on the code on a company's laptop
+
+:arrow_right: you can not connect the laptop to the intranet
+
+:arrow_right: you can transfer company's **USB sticks** between the intranet and the laptop
+
+:arrow_right: the code is allowed on the laptop, the intranet or the USB sticks **only**
+
+]
+.column.middle.w40[
+.mermaid[
+    sequenceDiagram
+        Note over Intranet: Repo
+        Intranet->>Laptop: USB copy
+        Note over Intranet: Changes
+        Note over Laptop: Changes
+        Laptop->>Intranet: USB copy
+        Note over Intranet: Updated repo
+]
+]
+]
+
+---
+
+# Special `git` workflows
+
+.row[
+.column.w60[
+.block[
+
+## Offline `git` workflow 2
+
+:arrow_right: the "official" repo is on network `A`
+
+:arrow_right: you have to develop on network `B`
+
+:arrow_right: you can use **USB sticks** between networks `A` and `B` 
+]
+
+## Possible issues with the LAN solution
+
+* The repo may be **bigger than the USB stick capacity**
+
+* `git clone` **takes forever** (slow IO + large repo)
+]
+.column.middle.w40[
+.mermaid[
+    sequenceDiagram
+        Note over Intranet: Repo
+        Intranet->>Laptop: USB copy
+        Note over Intranet: Changes
+        Note over Laptop: Changes
+        Laptop->>Intranet: USB copy
+        Note over Intranet: Updated repo
+]
+]
+]
+
+---
+
+# Special `git` workflows
+
+.row[
+.column.w60[
+.block[
+
+## Offline `git` workflow 2
+
+:arrow_right: the "official" repo is on network `A`
+
+:arrow_right: you have to develop on network `B`
+
+:arrow_right: you can use **USB sticks** between networks `A` and `B` 
+]
+
+## Possible solution #1
+
+1. copy **only the last version of the code** on the laptop
+1. initialize a `git` repo on the laptop
+1. create commits on the laptop
+1. create a **patch** on the laptop
+1. copy the patch to the intranet
+1. apply the patch to the repo
+]
+.column.middle.w40[
+.mermaid[
+    sequenceDiagram
+        Note over Intranet: Repo
+        Intranet->>Laptop: .tgz
+        Note over Intranet: Changes
+        Note over Laptop: Changes
+        Laptop->>Intranet: .patch
+        Note over Intranet: Updated repo
+]
+]
+]
+
+---
+
+# Special `git` workflows
+
+## Possible solution #1
+
+1. copy **only the last version of the code** on the laptop
+```shell
+laptop> git archive --format=tar --remote=ssh://gitrepos.intra.company.com/topsecret.git HEAD
+```
+1. initialize a `git` repo on the laptop
+1. create commits on the laptop
+1. create a **patch** on the laptop
+1. copy the patch to the intranet
+1. apply the patch to the repo
+
+TODO
+
+---
+
+# Special `git` workflows
+
+.row[
+.column.w60[
+.block[
+
+## Offline `git` workflow 2
+
+:arrow_right: the "official" repo is on network `A`
+
+:arrow_right: you have to develop on network `B`
+
+:arrow_right: you can use **USB sticks** between networks `A` and `B` 
+]
+
+## Possible solution #1
+
+1. copy **only the last version of the code** on the laptop
+1. initialize a `git` repo on the laptop
+1. create commits on the laptop
+1. create a **patch** on the laptop
+1. copy the patch to the intranet
+1. apply the patch to the repo
+
+## Possible issues
+
+1. one has to remember which version was in the archive
+1. one has no access to previous commits of the project
+]
+.column.w40.middle[
+.mermaid[
+    sequenceDiagram
+        Note over Intranet: Repo
+        Intranet->>Laptop: .tgz
+        Note over Intranet: Changes
+        Note over Laptop: Changes
+        Laptop->>Intranet: .patch
+        Note over Intranet: Updated repo
+]
+]
+]
+
+---
+
+# Special `git` workflows
+
+.row[
+.column.w60[
+.block[
+
+## Offline `git` workflow 2
+
+:arrow_right: the "official" repo is on network `A`
+
+:arrow_right: you have to develop on network `B`
+
+:arrow_right: you can use **USB sticks** between networks `A` and `B` 
+]
+
+## Possible solution #2
+
+1. **clone only some recent versions of the code** on the laptop
+1. create commits on the laptop
+1. create **patches** on the laptop
+1. copy the patches to the intranet
+1. apply the patches to the repo
+]
+.column.w40.middle[
+.mermaid[
+    sequenceDiagram
+        Note over Intranet: Repo
+        Intranet->>Laptop: git clone --depth
+        Note over Intranet: Changes
+        Note over Laptop: Changes
+        Laptop->>Intranet: patches
+        Note over Intranet: Updated repo
+]
+]
+]
+
+---
+
+# Special `git` workflows
+
+.row[
+.column.w60[
+.block[
+
+## Offline `git` workflow 2
+
+:arrow_right: the "official" repo is on network `A`
+
+:arrow_right: you have to develop on network `B`
+
+:arrow_right: you can use **USB sticks** between networks `A` and `B` 
+]
+
+## Possible solution #2
+
+1. **clone only some recent versions of the code** on the laptop
+1. create commits on the laptop
+1. create **patches** on the laptop
+1. copy the patches to the intranet
+1. apply the patches to the repo
+
+## Possible issues
+
+:arrow_right: **NO ISSUES** :v:
+
+]
+.column.w40.middle[
+.mermaid[
+    sequenceDiagram
+        Note over Intranet: Repo
+        Intranet->>Laptop: git clone --depth
+        Note over Intranet: Changes
+        Note over Laptop: Changes
+        Laptop->>Intranet: patches
+        Note over Intranet: Updated repo
+]
+]
+]
+
+---
+
+# plop
 
 ## History
 * distributed version control system
