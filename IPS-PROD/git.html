@@ -33,7 +33,6 @@ workflow : travailler sur un autre réseau
 
 * git clone --depth=1 ... (recuperer une partie seulement de l'historique)
 * git format-patch (creer patch)
-* copy patch
 * git apply (voir infos dans patch)
 * git am (appliquer patch)
 
@@ -146,7 +145,7 @@ laptop> git clone ssh://gitrepos.intra.company.com/topsecret.git
 1. create commits on the laptop
 ```shell
 laptop> git add ...
-laptop> git commit -m "user can now order quiches"
+laptop> git commit -m "user can now order tacos"
 laptop> git add ...
 laptop> git commit -m "user can now order pizzas"
 ```
@@ -220,7 +219,7 @@ laptop> git push
 
 * The repo may be **bigger than the USB stick capacity**
 
-* `git clone` **takes forever** (slow IO + large repo)
+* `git clone` **may take forever** (slow IO + large repo)
 ]
 .column.middle.w40[
 .mermaid[
@@ -254,11 +253,10 @@ laptop> git push
 
 ## Possible solution #1
 
-1. copy **only the last version of the code** on the laptop
+1. copy **only the last version of the code** to the laptop
 1. initialize a `git` repo on the laptop
 1. create commits on the laptop
 1. create a **patch** on the laptop
-1. copy the patch to the intranet
 1. apply the patch to the repo
 ]
 .column.middle.w40[
@@ -280,17 +278,38 @@ laptop> git push
 
 ## Possible solution #1
 
-1. copy **only the last version of the code** on the laptop
+1. copy **only the last version of the code** to the laptop ( :warning: does not work on `github.com`)
 ```shell
-laptop> git archive --format=tar --remote=ssh://gitrepos.intra.company.com/topsecret.git HEAD
+intranet> git archive --format=tar --remote=~/workspace/topsecret master | gzip - > /media/dubrayn/usbdisk/topsecret.tgz
+intranet> eject /media/dubrayn/usbdisk
+laptop> mkdir topsecret
+laptop> cd topsecret
+laptop> tar xvfz /media/dubrayn/usbstick/topsecret.tgz
 ```
 1. initialize a `git` repo on the laptop
-1. create commits on the laptop
+```shell
+laptop> git init
+laptop> git add -A
+laptop> git commit -m "initial commit"
+```
+1. create commits on the laptop (in a new branch)
+```shell
+laptop> git checkout -b localwork
+laptop> git add ...
+laptop> git commit -m "user can now order tacos"
+laptop> git add ...
+laptop> git commit -m "user can now order pizzas"
+```
 1. create a **patch** on the laptop
-1. copy the patch to the intranet
+```shell
+laptop> git format-patch master --stdout > /media/dubrayn/usbdisk/toto.patch
+laptop> eject /media/dubrayn/usbdisk
+```
 1. apply the patch to the repo
-
-TODO
+```shell
+intranet> cd ~/workspace/topsecret
+intranet> git am /media/dubrayn/usbdisk/toto.patch
+```
 
 ---
 
@@ -311,11 +330,10 @@ TODO
 
 ## Possible solution #1
 
-1. copy **only the last version of the code** on the laptop
+1. copy **only the last version of the code** to the laptop
 1. initialize a `git` repo on the laptop
 1. create commits on the laptop
 1. create a **patch** on the laptop
-1. copy the patch to the intranet
 1. apply the patch to the repo
 
 ## Possible issues
@@ -355,11 +373,10 @@ TODO
 
 ## Possible solution #2
 
-1. **clone only some recent versions of the code** on the laptop
+1. **clone only the last commits** on the laptop
 1. create commits on the laptop
-1. create **patches** on the laptop
-1. copy the patches to the intranet
-1. apply the patches to the repo
+1. create a **patch** on the laptop
+1. apply the patch to the repo
 ]
 .column.w40.middle[
 .mermaid[
@@ -368,11 +385,42 @@ TODO
         Intranet->>Laptop: git clone --depth
         Note over Intranet: Changes
         Note over Laptop: Changes
-        Laptop->>Intranet: patches
+        Laptop->>Intranet: .patch
         Note over Intranet: Updated repo
 ]
 ]
 ]
+
+---
+
+# Special `git` workflows
+
+## Possible solution #2
+
+1. **clone only some recent versions of the code** on the laptop
+```shell
+intranet> git clone -b master --depth=5 file:///home/dubrayn/workspace/topsecret /media/dubrayn/usbdisk/topsecret
+intranet> eject /media/dubrayn/usbdisk
+laptop> cp -rf /media/dubrayn/usbstick/topsecret . && cd topsecret
+```
+1. create commits on the laptop (in a new branch)
+```shell
+laptop> git checkout -b localwork
+laptop> git add ...
+laptop> git commit -m "user can now order tacos"
+laptop> git add ...
+laptop> git commit -m "user can now order pizzas"
+```
+1. create a **patch** on the laptop
+```shell
+laptop> git format-patch master --stdout > /media/dubrayn/usbdisk/toto.patch
+laptop> eject /media/dubrayn/usbdisk
+```
+1. apply the patch to the repo
+```shell
+intranet> cd ~/workspace/topsecret
+intranet> git am /media/dubrayn/usbdisk/toto.patch
+```
 
 ---
 
@@ -393,11 +441,10 @@ TODO
 
 ## Possible solution #2
 
-1. **clone only some recent versions of the code** on the laptop
+1. **clone only the last commits** on the laptop
 1. create commits on the laptop
-1. create **patches** on the laptop
-1. copy the patches to the intranet
-1. apply the patches to the repo
+1. create a **patch** on the laptop
+1. apply the patch to the repo
 
 ## Possible issues
 
@@ -419,484 +466,23 @@ TODO
 
 ---
 
-# plop
+# Special `git` workflows
 
-## History
-* distributed version control system
-* created by **Linus Torvalds** in 2005 as free software (GPL v2)
-* initial goal: become the main VCS (Version Control System) of the **Linux kernel**
-* today: **#1 VCS** :v:
+## `git apply`
 
-## Characteristics
-* strong support for non-linear development
-* distributed development
-* compatibility with existant systems and protocols
-* efficient handling of large projects
-* cryptographic authentication of history
-
-.block[
-* Repository: [https://github.com/git/git](https://github.com/git/git)
-* Website: [https://git-scm.com](https://git-scm.com)
-* License: `LGPL-2.1`
-]
-
----
-
-# `git` workflow
-
-.mermaid[
-    sequenceDiagram
-        Remote-->>+Local repo: git clone/pull
-        Note over Staged: Empty
-        Local repo->>Files: git checkout
-        Note over Files: Code...
-        Files->>+Staged: git add/rm
-        Staged->>-Local repo: git commit
-        Note over Files: Code...
-        Files->>+Staged: git add/rm
-        Staged->>-Local repo: git commit
-        Local repo-->>-Remote: git push
-]
-
----
-
-# Creation of a `git` repo from scratch
-
-<div data-dir='scripts/toto4' class='cinescript'></div>
-
----
-
-# Main `git` commands
-
-## Configure `git` (should be done once)
+:arrow_right: Use `--check` to see if a patch can be applied
 ```shell
-$ git config --global user.name "Your Name"
-$ git config --global user.email you@yourdomain.example.com
+$ git apply --check ../tutu.patch
+error: new_file2: already exists in working directory
 ```
 
-## Create a local repo
+:arrow_right: Use `--stat` to see the `diffstat`
 ```shell
-$ git init
+$ git apply --stat ../tutu.patch
+ new_file1 |     0
+ new_file2 |     0
+ 2 files changed, 0 insertions(+), 0 deletions(-)
 ```
-
-## Clone a remote repo (and create a local repo)
-```shell
-$ git clone http://some.domain.com/path/to/repo.git
-```
-
-## Get documentation
-```shell
-$ # Example: documentation for command 'git clone'
-$ git help clone
-```
-
----
-
-class: top
-
-# Typical `git` workflow
-
-## 1. clone or create repo
-```shell
-$ git clone http://some.domain.com/path/to/repo.git
-```
---
-
-## 2. make some changes
-```shell
-$ vim README.md # create new file
-$ vim main.cpp  # edit existing file
-$ rm toto.h     # remove existing file
-```
---
-
-## 3. **stage** changes
-```shell
-$ git add main.cpp README.md
-$ git rm toto.h
-```
---
-
-## 4. check staged changes
-```shell
-$ git diff
-$ git status
-```
---
-
-## 5. commit staged changes
-```shell
-$ git commit  # will open an editor to enter the commit message
-$ git commit -m "Commit message"
-```
-
----
-
-# `git` history
-
-## View project history (CLI)
-```shell
-$ git log
-$ git log --draw --oneline --color
-```
-
-<div data-dir='scripts/toto5' class='cinescript'></div>
-
----
-
-# GUI tool `gitk`
-
-.hcenter.w90.shadow[![](images/gitk_00.png)]
-
----
-
-# GUI tool `gitg`
-
-.hcenter.w90.shadow[![](images/gitg.png)]
-
----
-
-# `git` branches
-
-.row[
-.column.middle.w45[
-## List branches
-```shell
-$ git branch
-   dev
- * main
-```
-
-## Create a branch
-```shell
-$ git branch dev
-```
-
-## Switch to a branch
-```shell
-$ git checkout dev
-```
-
-## Create + switch to a branch
-```shell
-$ git checkout -b dev
-```
-
-## Merge a branch
-```shell
-$ git merge dev
-```
-
-## Delete a branch
-```shell
-$ git branch -d dev
-```
-]
-.column[
- <canvas id='gitExample0'></canvas>
-]
-]
-
----
-
-class: top
-
-# How to use `git` branches
-
-.row[
-.column.w45[
-* SuperProg :copyright: is in state **v0.2.0**
-* you start working on a new functionnality by creating a branch and commiting on it
-]
-
-.column[
- <canvas id='branchHowto0'></canvas>
-]
-]
-
----
-
-class: top
-
-# How to use `git` branches
-
-.row[
-.column.w45[
-* SuperProg :copyright: is in state **v0.2.0**
-* you start working on a new functionnality by creating a branch and commiting on it
-```shell
-$ git checkout -b newfunc
-$ # some work
-$ git commit -m "Commit D"
-...
-$ # some work
-$ git commit -m "Commit F"
-```
-]
-
-.column[
- <canvas id='branchHowto1'></canvas>
-]
-]
-
----
-
-class: top
-
-# How to use `git` branches
-
-.row[
-.column.w45[
-* SuperProg :copyright: is in state **v0.2.0**
-* you start working on a new functionnality by creating a branch and commiting on it
-```shell
-$ git checkout -b newfunc
-$ # some work
-$ git commit -m "Commit D"
-...
-$ # some work
-$ git commit -m "Commit F"
-```
-* :warning: **issue #627 needs to be fixed**
-* you create a branch to fix the issue
-]
-
-.column[
- <canvas id='branchHowto2'></canvas>
-]
-]
-
----
-
-class: top
-
-# How to use `git` branches
-
-.row[
-.column.w45[
-* SuperProg :copyright: is in state **v0.2.0**
-* you start working on a new functionnality by creating a branch and commiting on it
-```shell
-$ git checkout -b newfunc
-$ # some work
-$ git commit -m "Commit D"
-...
-$ # some work
-$ git commit -m "Commit F"
-```
-* :warning: **issue #627 needs to be fixed**
-* you create a branch to fix the issue
-```shell
-$ git checkout master
-$ git checkout -b fixit
-$ # some work
-$ git commit -m "Commit G"
-...
-$ # some work
-$ git commit -m "Fixed issue #627"
-```
-]
-
-.column[
- <canvas id='branchHowto3'></canvas>
-]
-]
-
----
-
-class: top
-
-# How to use `git` branches
-
-.row[
-.column.w45[
-* SuperProg :copyright: is in state **v0.2.0**
-* you start working on a new functionnality by creating a branch and commiting on it
-```shell
-$ git checkout -b newfunc
-$ # some work
-$ git commit -m "Commit D"
-...
-$ # some work
-$ git commit -m "Commit F"
-```
-* :warning: **issue #627 needs to be fixed**
-* you create a branch to fix the issue
-```shell
-$ git checkout master
-$ git checkout -b fixit
-$ # some work
-$ git commit -m "Commit G"
-...
-$ # some work
-$ git commit -m "Fixed issue #627"
-```
-* you merge your fix in `master`
-]
-
-.column[
- <canvas id='branchHowto4'></canvas>
-]
-]
-
----
-
-class: top
-
-# How to use `git` branches
-
-.row[
-.column.w45[
-* SuperProg :copyright: is in state **v0.2.0**
-* you start working on a new functionnality by creating a branch and commiting on it
-```shell
-$ git checkout -b newfunc
-$ # some work
-$ git commit -m "Commit D"
-...
-$ # some work
-$ git commit -m "Commit F"
-```
-* :warning: **issue #627 needs to be fixed**
-* you create a branch to fix the issue
-```shell
-$ git checkout master
-$ git checkout -b fixit
-$ # some work
-$ git commit -m "Commit G"
-...
-$ # some work
-$ git commit -m "Fixed issue #627"
-```
-* you merge your fix in `master`
-```shell
-$ git checkout master
-$ git merge fixit
-$ git tag v0.2.1 # lightweight tag
-```
-]
-
-.column[
- <canvas id='branchHowto5'></canvas>
-]
-]
-
----
-
-class: top
-
-# How to use `git` branches
-
-.row[
-.column.w45[
-* SuperProg :copyright: is in state **v0.2.1**
-* you can resume working on the new functionnality
-]
-
-.column[
- <canvas id='branchHowto6'></canvas>
-]
-]
-
----
-
-class: top
-
-# How to use `git` branches
-
-.row[
-.column.w45[
-* SuperProg :copyright: is in state **v0.2.1**
-* you can resume working on the new functionnality
-```shell
-$ git checkout newfunc
-$ # some work
-$ git commit -m "Commit J"
-```
-* when you are ready, merge the new functionnality in the `master` branch
-]
-
-.column[
- <canvas id='branchHowto7'></canvas>
-]
-]
-
----
-
-class: top
-
-# How to use `git` branches
-
-.row[
-.column.w45[
-* SuperProg :copyright: is in state **v0.2.1**
-* you can resume working on the new functionnality
-```shell
-$ git checkout newfunc
-$ # some work
-$ git commit -m "Commit J"
-```
-* when you are ready, merge the new functionnality in the `master` branch
-```shell
-$ git checkout master
-$ git merge newfunc
-$ git tag v0.3.0
-```
-]
-
-.column[
- <canvas id='branchHowto8'></canvas>
-]
-]
-
----
-
-# Remote repositories
-
-.mermaid.w70.hcenter[
-    sequenceDiagram
-        Remote-->>+Local repo: git clone/pull
-        Local repo->>Files: git checkout
-        Note over Files: Code...
-        Files->>+Staged: git add/rm
-        Staged->>-Local repo: git commit
-        Local repo-->>-Remote: git push
-]
-
-## Create a bare repo
-```shell
-$ git init --bare
-```
-
-## Declare and sync from a remote repo
-```shell
-$ git remote add farAway http://some.domain.com/path/to/repo.git
-$ git fetch farAway && git merge
-$ git pull farAway
-```
-
----
-
-# Conclusions on `git`
-
-.row[
-.column.w40.middle[
-## To sum up...
-* very powerful tool, can be complex sometimes
-* **can work offline !**
-* rock-solid, very efficient
-* **decentralized !**
-* several source forges are using it (`github`, `bitbucket`, `gitlab`, etc...)
-* learn a few commands and start using it !
-* several ways to use it, *follow the guidelines*
-* **the de-facto standard CVS**
-
-.hcenter.w50[![](images/git_logo.png)]
-]
-.column.w55[
-<canvas id='gitExample1'></canvas>
-]
-]
 
     </textarea>
 
