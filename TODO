@@ -77,15 +77,15 @@ Project:
 
 ---- WEEK2 ----
 
-* git advanced uses
-* blender
+* valgrind
+* gdb
 
 === TP2
 
 ---- WEEK3 ----
 
-* valgrind
-* gdb
+* git advanced uses
+* blender
 
 === TP3
 
@@ -221,7 +221,3 @@ Project:
 
 BUG: trailing empty code lines are removed by markdown parser in remark.js
 BUG: plotly.js does not like CSS scale transform (mouse coords are messed up)
-
-Additional slides:
-
-* git: advanced techniques
